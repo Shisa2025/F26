@@ -12,3 +12,9 @@ let totalPrice = "5.99";
 let quantity = "3 bags";
 
 // Type your code here:
+let priceFloat = parseFloat(totalPrice);
+let quantityInt = parseInt(quantity);
+let chipsPrice = priceFloat / quantityInt;
+
+console.log(chipsPrice);
+console.log(chipsPrice.toFixed(2));

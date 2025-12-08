@@ -11,3 +11,14 @@ Log the variables "first" and "second", and the array "others" to the console.
 let phonetics = ["Alpha", "Bravo", "Charlie", "Delta"];
 
 // Type your code here:
+console.log(phonetics[0]);
+
+console.log(phonetics[phonetics.length - 1]);
+
+phonetics[2] = "Echo";
+console.log(phonetics);
+
+let [first, second, ...others] = phonetics;
+console.log(first);
+console.log(second);
+console.log(others);

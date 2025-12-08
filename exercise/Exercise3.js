@@ -14,3 +14,10 @@ let lastName = "Shakespeare";
 let quote = "To be, or not to be, that is the question.";
 
 // Type your code here:
+let initials = firstName[0] + ". " + lastName[0] + ".";
+console.log(initials);
+
+console.log(quote.length);
+
+let questionIndex = quote.indexOf("question");
+console.log(questionIndex);

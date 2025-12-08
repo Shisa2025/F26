@@ -6,6 +6,15 @@ Use a try-catch block to catch the error and log the error message to the consol
 */
 
 // Type your code here:
+function checkAge(age) {
+    try {
+        if (typeof age !== "number") {
+            throw new Error("Age must be a number.");
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 
 // Do not modify:
 checkAge("BuildingBloCS"); // Age must be a number.

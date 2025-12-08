@@ -6,6 +6,13 @@ Create two functions:
 */
 
 // Type your code here:
+function totalCost(itemPrice, quantity) {
+    return itemPrice * quantity;
+}
+
+function applyDiscount(totalAmount, discountRate) {
+    return totalAmount * (1 - discountRate);
+}
 
 // Do not modify:
 let total = totalCost(50, 3); // 50 is item price, 3 is quantity

@@ -11,3 +11,10 @@ Use "if" statements to take the ages as arguments and log the correct price to t
 let age = 15;
 
 // Type your code here:
+if (age < 12) {
+    console.log("$5");
+} else if (age >= 13 && age <= 17) {
+    console.log("$8");
+} else if (age >= 18) {
+    console.log("$10");
+}

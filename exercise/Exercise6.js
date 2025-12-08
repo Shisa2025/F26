@@ -14,3 +14,11 @@ let student = {
 };
 
 // Type your code here:
+student.hobby = "Gaming";
+console.log(student.hobby);
+
+console.log("age" in student);
+
+let { name, age } = student;
+console.log(name);
+console.log(age);
