@@ -79,3 +79,34 @@
   pointer-events: none;
   mix-blend-mode: screen;
 }
+
+.shine-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-sweep::after {
+  content: '';
+  position: absolute;
+  inset: -30% -60%;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.18) 45%, transparent 80%);
+  transform: translateX(-100%);
+  animation: sweep 6s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.35;
+  }
+  45% {
+    transform: translateX(120%);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(180%);
+    opacity: 0;
+  }
+}
