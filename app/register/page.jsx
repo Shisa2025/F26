@@ -177,7 +177,7 @@ export default function RegisterPage() {
         </div>
 
         <form
-          className="space-y-4 bg-white border border-red-200 rounded-2xl p-5 shadow-xl"
+          className="relative space-y-4 bg-white border border-red-200 rounded-2xl p-5 shadow-xl"
           onSubmit={handleSubmit}
         >
           <div className="space-y-2">
@@ -227,6 +227,7 @@ export default function RegisterPage() {
           {error && <div className="text-sm text-red-600">{error}</div>}
 
           <div className="text-center text-sm flex items-center justify-center gap-3 text-red-700">
+            Already have an account?{' '}
             <button 
             id='signinbutton' 
             onClick={handleSignIn}
