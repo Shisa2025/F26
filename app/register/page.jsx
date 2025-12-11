@@ -107,9 +107,13 @@ export default function RegisterPage() {
           {message && <div className="text-sm text-emerald-300">{message}</div>}
           {error && <div className="text-sm text-red-300">{error}</div>}
 
-          <div className="text-center text-sm">
-            <Link href="/" className="text-slate-300 underline hover:text-white">
+          <div className="text-center text-sm flex items-center justify-center gap-3 text-slate-300">
+            <Link href="/" className="underline hover:text-white">
               Back to home
+            </Link>
+            <span className="text-slate-500">•</span>
+            <Link href="/signin" className="underline hover:text-white font-semibold">
+              Login
             </Link>
           </div>
         </form>
