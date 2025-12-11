@@ -2,21 +2,41 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { animate, stagger, spring } from "animejs";
+import { animate, createTimeline } from "animejs";
 
 export default function AdminDisasterTypesPage() {
   const [types, setTypes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [creating, setCreating] = useState(false);
+  const [disasters, setDisasters] = useState([]);
+  const [loadingDisasters, setLoadingDisasters] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [filterTypeId, setFilterTypeId] = useState("all");
+  const [filterFrom, setFilterFrom] = useState("");
+  const [filterTo, setFilterTo] = useState("");
+  const [statusUpdating, setStatusUpdating] = useState({});
+  const formatDate = (value) => {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const dd = String(date.getUTCDate()).padStart(2, "0");
+    const yyyy = date.getUTCFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  };
+  const startOfDayUTC = (value) => {
+    if (!value) return "";
+    const d = new Date(`${value}T00:00:00Z`);
+    return Number.isNaN(d.getTime()) ? value : d.toISOString();
+  };
+  const endOfDayUTC = (value) => {
+    if (!value) return "";
+    const d = new Date(`${value}T23:59:59Z`);
+    return Number.isNaN(d.getTime()) ? value : d.toISOString();
+  };
 
   // --- load existing disaster types ---
   const loadTypes = async () => {
-    setLoading(true);
     setError("");
     try {
       const res = await fetch("/api/admin/disaster-type", { method: "GET" });
@@ -29,8 +49,6 @@ export default function AdminDisasterTypesPage() {
       }
     } catch (err) {
       setError(err?.message || "Network or server error");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -38,29 +56,99 @@ export default function AdminDisasterTypesPage() {
     loadTypes();
   }, []);
 
+  // load disasters with filters
+  const loadDisasters = async () => {
+    setLoadingDisasters(true);
+    setError("");
+    try {
+      const params = new URLSearchParams();
+      if (filterTypeId !== "all" && filterTypeId) params.set("typeId", filterTypeId);
+      if (filterFrom) params.set("from", startOfDayUTC(filterFrom));
+      if (filterTo) params.set("to", endOfDayUTC(filterTo));
+
+      const res = await fetch(`/api/admin/disasters?${params.toString()}`, {
+        method: "GET",
+      });
+      const text = await res.text();
+      const body = text ? JSON.parse(text) : {};
+      if (!res.ok) {
+        setError(body?.error || "Failed to load disasters");
+      } else {
+        setDisasters(body?.disasters || []);
+      }
+    } catch (err) {
+      setError(err?.message || "Network or server error");
+    } finally {
+      setLoadingDisasters(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDisasters();
+  }, [filterTypeId, filterFrom, filterTo]);
+
   // --- Anime.js animations ---
 
-  // animate form when page loads
+  // animate page when loads
   useEffect(() => {
-    animate(".type-form", {
+    const tl = createTimeline({});
+    tl.add("#disaster-subheading", {
       opacity: [0, 1],
-      translateY: [-20, 0],
+      translateY: [32, 0],
       duration: 700,
-      easing: spring({ bounce: 0.3, duration: 900 }),
+      easing: "easeOutQuad",
     });
+    tl.add(
+      "#disaster-heading",
+      {
+        opacity: [0, 1],
+        translateY: [32, 0],
+        duration: 700,
+        easing: "easeOutQuad",
+      },
+      "-=550"
+    );
+    tl.add(
+      "#disaster-copy",
+      {
+        opacity: [0, 1],
+        translateY: [24, 0],
+        duration: 650,
+        easing: "easeOutQuad",
+      },
+      "-=550"
+    );
+    tl.add(
+      "#disaster-back",
+      {
+        opacity: [0, 1],
+        translateY: [16, 0],
+        duration: 550,
+        easing: "easeOutQuad",
+      },
+      "-=500"
+    );
+    tl.add(
+      "#disaster-filter",
+      {
+        opacity: [0, 1],
+        translateY: [28, 0],
+        duration: 650,
+        easing: "easeOutQuad",
+      },
+      "-=450"
+    );
+    tl.add(
+      "#disaster-list",
+      {
+        opacity: [0, 1],
+        translateY: [28, 0],
+        duration: 700,
+        easing: "easeOutQuad",
+      },
+      "-=650"
+    );
   }, []);
-
-  // animate list items whenever types change
-  useEffect(() => {
-    if (!types.length) return;
-    animate(".type-item", {
-      opacity: [0, 1],
-      translateY: [-16, 0],
-      duration: 600,
-      delay: stagger(120),
-      easing: "outCubic",
-    });
-  }, [types]);
 
   // animate success chip whenever message changes
   useEffect(() => {
@@ -70,66 +158,67 @@ export default function AdminDisasterTypesPage() {
       translateY: [-10, 0],
       scale: [0.9, 1],
       duration: 450,
-      easing: "outCubic",
+      easing: "easeOutCubic",
     });
   }, [message]);
 
-  // --- create new type ---
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-
-    setCreating(true);
+  // --- update disaster status ---
+  const handleStatusChange = async (id, status) => {
+    setStatusUpdating((prev) => ({ ...prev, [id]: true }));
     setError("");
     setMessage("");
-
     try {
-      const res = await fetch("/api/admin/disaster-type", {
-        method: "POST",
+      const res = await fetch("/api/admin/disasters", {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          description: description.trim() || null,
-        }),
+        body: JSON.stringify({ id, status }),
       });
-
       const text = await res.text();
       const body = text ? JSON.parse(text) : {};
-
       if (!res.ok) {
-        setError(body?.error || "Failed to create disaster type");
+        setError(body?.error || "Failed to update status");
       } else {
-        setMessage(body?.message || "Disaster type created.");
-        setName("");
-        setDescription("");
-        loadTypes();
+        setMessage(body?.message || "Status updated.");
+        setDisasters((prev) =>
+          prev.map((d) => (d.id === id ? { ...d, status: status } : d))
+        );
       }
     } catch (err) {
       setError(err?.message || "Network or server error");
     } finally {
-      setCreating(false);
+      setStatusUpdating((prev) => ({ ...prev, [id]: false }));
     }
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 px-6 py-10 flex justify-center">
-      <div className="w-full max-w-4xl space-y-6">
+    <main className="min-h-screen bg-yellow-50 text-red-900 px-6 py-10">
+      <div className="w-full max-w-5xl mx-auto space-y-6">
         {/* header */}
         <div className="flex items-center justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-[0.2em] text-slate-400">
+          <div className="space-y-1">
+            <div
+              id="disaster-subheading"
+              className="text-xs uppercase tracking-[0.15em] text-red-800 font-medium opacity-0"
+            >
               Admin
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Create Disaster Type
+            <h1
+              id="disaster-heading"
+              className="text-4xl font-bold tracking-tight text-red-700 opacity-0"
+            >
+              Disaster Management
             </h1>
-            <p className="text-slate-300 text-sm">
-              Add a new disaster type to the system.
+            <p
+              id="disaster-copy"
+              className="text-base text-red-800 font-medium opacity-0"
+            >
+              Review and update disaster records with filters and status controls.
             </p>
           </div>
           <Link
             href="/admin/dashboard"
-            className="text-sm text-slate-200 underline"
+            id="disaster-back"
+            className="text-sm text-red-800 underline underline-offset-4 font-semibold opacity-0"
           >
             Back to dashboard
           </Link>
@@ -139,83 +228,138 @@ export default function AdminDisasterTypesPage() {
         {message && (
           <div
             id="type-success"
-            className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-2 text-xs text-emerald-200 border border-emerald-400/50"
+            className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-xs text-emerald-800 border border-emerald-300 shadow-sm"
           >
-            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
             {message}
           </div>
         )}
         {error && (
-          <div className="text-sm text-red-300 border border-red-500/40 bg-red-500/10 rounded-lg px-3 py-2">
+          <div className="text-sm text-red-700 border border-red-300 bg-red-100 rounded-lg px-3 py-2 shadow-sm">
             {error}
           </div>
         )}
 
-        {/* form card */}
-        <section className="type-form rounded-3xl border border-white/10 bg-white/5 p-6 space-y-4 shadow-lg transition hover:border-white/20 hover:shadow-[0_0_40px_rgba(242,74,114,0.25)]">
-          <form onSubmit={handleSubmit} className="space-y-4 text-sm">
+        {/* filter card */}
+        <section
+          id="disaster-filter"
+          className="rounded-3xl border border-red-200 bg-white p-5 shadow-xl text-sm text-red-900 space-y-3 opacity-0"
+        >
+          <div className="font-semibold text-red-800">Filter disasters</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-200">
-                Name
+              <label className="text-xs font-semibold text-red-700">
+                Category
+              </label>
+              <select
+                value={filterTypeId}
+                onChange={(e) => setFilterTypeId(e.target.value)}
+                className="w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-red-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition"
+              >
+                <option value="all">All categories</option>
+                {types.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-red-700">
+                From date
               </label>
               <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400/60 transition"
-                placeholder="e.g., Earthquake"
-                required
+                type="date"
+                value={filterFrom}
+                onChange={(e) => setFilterFrom(e.target.value)}
+                className="w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-red-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition"
               />
             </div>
-
             <div className="space-y-1">
-              <label className="text-sm font-medium text-slate-200">
-                Description
+              <label className="text-xs font-semibold text-red-700">
+                To date
               </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full min-h-[96px] rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400/60 transition resize-none"
-                placeholder="Optional notes"
+              <input
+                type="date"
+                value={filterTo}
+                onChange={(e) => setFilterTo(e.target.value)}
+                className="w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-red-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition"
               />
             </div>
-
+          </div>
+          {(filterTypeId !== "all" || filterFrom || filterTo) && (
             <button
-              type="submit"
-              disabled={creating}
-              className="w-full rounded-2xl bg-[#F24A72] py-3 text-sm font-semibold text-white shadow-md transition-transform duration-150 hover:bg-[#FF5C85] active:translate-y-[1px] active:shadow-sm disabled:opacity-60"
+              type="button"
+              onClick={() => {
+                setFilterTypeId("all");
+                setFilterFrom("");
+                setFilterTo("");
+              }}
+              className="text-xs font-semibold text-red-700 underline underline-offset-4"
             >
-              {creating ? "Creating…" : "Create Disaster Type"}
+              Clear filters
             </button>
-          </form>
+          )}
         </section>
 
-        {/* existing types */}
-        <section className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-xl space-y-3 text-sm">
+        {/* disaster list */}
+        <section
+          id="disaster-list"
+          className="rounded-3xl border border-red-200 bg-white p-5 shadow-xl space-y-3 text-sm opacity-0"
+        >
           <div className="flex items-center justify-between">
-            <div className="font-semibold">Existing disaster types</div>
-            {loading && (
-              <div className="text-xs text-slate-400">Loading…</div>
+            <div className="font-semibold text-red-800">Disaster records</div>
+            {loadingDisasters && (
+              <div className="text-xs text-red-700">Loading...</div>
             )}
           </div>
 
-          {!loading && types.length === 0 && (
-            <div className="text-sm text-slate-400">
-              No disaster types found yet.
+          {!loadingDisasters && disasters.length === 0 && (
+            <div className="text-sm text-red-700">
+              No disasters match the current filters.
             </div>
           )}
 
-          {!loading && types.length > 0 && (
-            <div className="space-y-2">
-              {types.map((t) => (
+          {!loadingDisasters && disasters.length > 0 && (
+            <div className="space-y-3">
+              {disasters.map((d) => (
                 <div
-                  key={t.id}
-                  className="type-item rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3 flex flex-col gap-1 transition hover:border-pink-400/60 hover:bg-white/[0.06]"
+                  key={d.id}
+                  className="rounded-2xl border border-red-100 bg-red-50 p-4 space-y-2 shadow-sm"
                 >
-                  <div className="font-semibold text-slate-50">
-                    {t.name || "Untitled type"}
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="font-semibold text-red-800">{d.title || "Untitled disaster"}</div>
+                    <div className="text-xs text-red-700">
+                      {d.disaster_type_name || "Uncategorized"}
+                    </div>
                   </div>
-                  <div className="text-xs text-slate-400">
-                    {t.description || "No description provided."}
+                  <div className="text-xs text-red-700">
+                    {d.description || "No description provided."}
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-xs text-red-700">
+                    {d.location && <span className="font-semibold">Location:</span>} {d.location}
+                    {d.occurred_at && (
+                      <span className="font-semibold">
+                        Occurred: {formatDate(d.occurred_at)}
+                      </span>
+                    )}
+                    {d.severity && <span className="font-semibold">Severity: {d.severity}</span>}
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-red-800">
+                    <span className="font-semibold">Status</span>
+                    <select
+                      value={d.status || "unverified"}
+                      onChange={(e) => handleStatusChange(d.id, e.target.value)}
+                      disabled={statusUpdating[d.id]}
+                      className="rounded-lg border border-red-200 bg-white px-3 py-1 text-red-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition"
+                    >
+                      <option value="unverified">Unverified</option>
+                      <option value="verified">Verified</option>
+                      <option value="fake">Fake</option>
+                    </select>
+                    {statusUpdating[d.id] && (
+                      <span className="text-red-600">Updating...</span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -226,4 +370,3 @@ export default function AdminDisasterTypesPage() {
     </main>
   );
 }
-
