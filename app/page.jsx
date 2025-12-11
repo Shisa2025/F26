@@ -66,12 +66,18 @@ export default function Home() {
         <div className="text-xs uppercase tracking-[0.2em] text-red-500 font-semibold">Disaster Simulation</div>
         <h1 className="text-8xl font-bold tracking-tight">Welcome</h1>
         <p className="text-red-500">Choose an action to continue.</p>
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center gap-4 flex-wrap">
           <Link
             href="/register"
             className="px-5 py-3 rounded-xl border border-red-700 bg-sky-200 text-slate-900 font-semibold shadow hover:bg-white"
           >
             Get started
+          </Link>
+          <Link
+            href="/signin"
+            className="px-5 py-3 rounded-xl border border-red-700 bg-white text-red-700 font-semibold shadow hover:bg-sky-100"
+          >
+            Login
           </Link>
           <Link
             href="/more-info"
