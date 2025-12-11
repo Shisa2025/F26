@@ -9,6 +9,24 @@ const STATUS_LABEL = {
   banned: 'Banned',
 };
 
+const formatDate = (value) => {
+  if (!value) return '';
+  try {
+    return new Date(value).toLocaleString('en-US', {
+      timeZone: 'UTC',
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+  } catch {
+    return value;
+  }
+};
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -100,7 +118,7 @@ export default function AdminUsersPage() {
                       Role: {u.role} · Status: {STATUS_LABEL[u.account_status] ?? u.account_status}
                     </div>
                     {u.user_name && <div className="text-slate-500 text-xs">Username: {u.user_name}</div>}
-                    <div className="text-slate-500 text-xs">Created: {u.created_at}</div>
+                    <div className="text-slate-500 text-xs">Created: {formatDate(u.created_at)}</div>
                   </div>
                   <div className="flex gap-2">
                     {u.account_status !== 'banned' && (

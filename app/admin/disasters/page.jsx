@@ -34,6 +34,18 @@ export default function AdminDisastersPage() {
   const [toDate, setToDate] = useState('');
   const [types, setTypes] = useState([]);
 
+  const normalizeDate = (value, endOfDay = false) => {
+    if (!value) return '';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return '';
+    if (endOfDay) {
+      parsed.setUTCHours(23, 59, 59, 999);
+    } else {
+      parsed.setUTCHours(0, 0, 0, 0);
+    }
+    return parsed.toISOString();
+  };
+
   const loadTypes = async () => {
     try {
       const res = await fetch('/api/admin/disaster-type', { method: 'GET' });
@@ -51,8 +63,10 @@ export default function AdminDisastersPage() {
     try {
       const params = new URLSearchParams();
       if (typeFilter) params.set('typeId', typeFilter);
-      if (fromDate) params.set('from', fromDate);
-      if (toDate) params.set('to', toDate);
+      const fromIso = normalizeDate(fromDate, false);
+      const toIso = normalizeDate(toDate, true);
+      if (fromIso) params.set('from', fromIso);
+      if (toIso) params.set('to', toIso);
       const res = await fetch(`/api/admin/disasters?${params.toString()}`, { method: 'GET' });
       const text = await res.text();
       const body = text ? JSON.parse(text) : {};
@@ -134,21 +148,27 @@ export default function AdminDisastersPage() {
               </select>
             </div>
             <div className="space-y-1">
-              <div className="text-xs uppercase tracking-[0.12em] text-slate-400">From</div>
+              <div className="text-xs uppercase tracking-[0.12em] text-slate-400">From (YYYY-MM-DD)</div>
               <input
-                type="date"
+                type="text"
+                inputMode="numeric"
+                pattern="\d{4}-\d{2}-\d{2}"
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
                 className="w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-slate-100"
+                placeholder="YYYY-MM-DD"
               />
             </div>
             <div className="space-y-1">
-              <div className="text-xs uppercase tracking-[0.12em] text-slate-400">To</div>
+              <div className="text-xs uppercase tracking-[0.12em] text-slate-400">To (YYYY-MM-DD)</div>
               <input
-                type="date"
+                type="text"
+                inputMode="numeric"
+                pattern="\d{4}-\d{2}-\d{2}"
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
                 className="w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-slate-100"
+                placeholder="YYYY-MM-DD"
               />
             </div>
           </div>
