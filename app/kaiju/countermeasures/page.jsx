@@ -261,8 +261,9 @@ export default function CountermeasuresPage() {
       </div>
 
       <footer className="text-[0.78rem] text-slate-400 border-t border-white/10 px-4 py-3 text-right bg-slate-950/80">
-        © 2025 National Kaiju Response Agency (Demo) | Countermeasure sheet
+        Ac 2025 National Kaiju Response Agency (Demo) | Countermeasure sheet
       </footer>
     </div>
   );
 }
+

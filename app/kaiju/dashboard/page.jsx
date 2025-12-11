@@ -114,8 +114,7 @@ export default function DashboardPage() {
             </div>
             <div className="text-2xl font-bold">Live Threat Monitor</div>
             <div className="text-sm text-slate-200/80 max-w-xl">
-              Command dashboard prototype: simulated kaiju crisis with active monitoring, response actions, and evacuation
-              guidance. Judges: start with the quick brief or jump to the list.
+              Command dashboard prototype: simulated kaiju crisis with active monitoring, response actions, and evacuation guidance. Judges: start with the quick brief or jump to the list.
             </div>
             <div className="flex flex-wrap gap-2 text-[0.8rem]">
               <span className="px-3 py-1 rounded-full border border-white/20 bg-white/10 text-white">Live feel</span>
@@ -387,7 +386,4 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-
-
 

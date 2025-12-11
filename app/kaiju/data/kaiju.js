@@ -180,12 +180,12 @@ export const countermeasureOperations = [
 ];
 
 export const synopsisSlides = [
-  { src: '/synopsis/picture/img1.png', line: 'Unidentified lifeforms have simultaneously appeared across the globe.' },
-  { src: '/synopsis/picture/img2.png', line: 'From aerial predators to terrestrial behemoths, they are tearing our world apart.' },
-  { src: '/synopsis/picture/img3.png', line: 'Communications are down. Without centralized data, humanity is losing the war.' },
-  { src: '/synopsis/picture/img4.png', line: 'Our only hope lies in a digital nexus capable of real-time tracking and global command.' },
-  { src: '/synopsis/picture/img5.png', line: 'The Government has formed the "Super Beast Countermeasure Agency" and activated the "Lolo" defense grid.' },
-  { src: '/synopsis/picture/img6.png', line: 'Control has been transferred to you. Log in, repel the monsters, and save our civilization.' },
+  { src: '/kaiju/synopsis/picture/img1.png', line: 'Unidentified lifeforms have simultaneously appeared across the globe.' },
+  { src: '/kaiju/synopsis/picture/img2.png', line: 'From aerial predators to terrestrial behemoths, they are tearing our world apart.' },
+  { src: '/kaiju/synopsis/picture/img3.png', line: 'Communications are down. Without centralized data, humanity is losing the war.' },
+  { src: '/kaiju/synopsis/picture/img4.png', line: 'Our only hope lies in a digital nexus capable of real-time tracking and global command.' },
+  { src: '/kaiju/synopsis/picture/img5.png', line: 'The Government has formed the \"Super Beast Countermeasure Agency\" and activated the \"Lolo\" defense grid.' },
+  { src: '/kaiju/synopsis/picture/img6.png', line: 'Control has been transferred to you. Log in, repel the monsters, and save our civilization.' },
 ];
 
-export const synopsisAudio = '/synopsis/bgm/yashimasakusen.MP3';
+export const synopsisAudio = '/kaiju/synopsis/bgm/yashimasakusen.MP3';

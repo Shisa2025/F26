@@ -86,7 +86,7 @@ export default function SynopsisPage() {
   useEffect(() => {
     const loadSlides = async () => {
       try {
-        const res = await fetch('/synopsis/description.txt');
+        const res = await fetch('/kaiju/synopsis/description.txt');
         const isText = res.headers.get('content-type')?.includes('text/plain');
         if (!res.ok || !isText) return;
         const text = await res.text();
@@ -96,7 +96,7 @@ export default function SynopsisPage() {
           .filter(Boolean);
         if (lines.length === 0 || /^<!doctype/i.test(lines[0])) return;
         const next = Array.from({ length: Math.min(lines.length, 6) }, (_, i) => ({
-          src: `/synopsis/picture/img${i + 1}.png`,
+          src: `/kaiju/synopsis/picture/img${i + 1}.png`,
           line: lines[i],
         }));
         setSlides(next);
@@ -185,7 +185,7 @@ export default function SynopsisPage() {
                 See again
               </button>
               <a
-                href="/"
+                href="/kaiju"
                 onClick={(e) => e.stopPropagation()}
                 className="px-5 py-3 rounded-full border border-white/20 bg-white/10 hover:bg-white/20 transition"
               >
