@@ -31,9 +31,9 @@ function navConfig(pathname) {
   return {
     brand: { label: "DisasterBuddy", href: "/" },
     items: [
-      { label: "Login", href: "/signin" },
       { label: "Register", href: "/register" },
-      { label: "More info", href: "/" },
+      { label: "Login", href: "/signin" },
+      { label: "More info", href: "/info" },
     ],
   };
 }

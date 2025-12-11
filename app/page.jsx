@@ -1,39 +1,68 @@
 'use client';
 
 import Link from 'next/link';
+import {animate, createTimeline} from 'animejs';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <main className="min-h-screen bg-yellow-50 text-red-700 flex items-center justify-center px-6">
-      <div className="max-w-3xl w-full space-y-8 text-center">
-        <div className="text-xs uppercase tracking-[0.2em] text-red-500 font-semibold">DisasterBuddy</div>
-        <div className="space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-red-800">Stay informed. Report safely.</h1>
-          <p className="text-red-600 text-base md:text-lg">
-            Crowdsourced disaster reporting to keep communities aware. Spot incidents, share verified details, and see
-            them on a live map so responders and neighbors can act fast.
-          </p>
-          <p className="text-red-600 text-base md:text-lg">
-            Built for rapid updates, trusted categories, and clear severity levels—whether you&apos;re on the ground or
-            coordinating remotely.
-          </p>
-        </div>
+  const router = useRouter();
 
-        <div className="flex justify-center gap-4 flex-wrap">
-          <Link
-            href="/signin"
-            className="px-6 py-3 rounded-xl bg-red-600 text-white font-semibold shadow hover:bg-red-500 transition"
-          >
-            Get started
-          </Link>
-          <Link
-            href="/"
-            className="px-6 py-3 rounded-xl border border-red-300 text-red-700 bg-white font-semibold shadow-sm hover:bg-red-50 transition"
-          >
-            Learn more
-          </Link>
-        </div>
-      </div>
+  useEffect(() => {
+    const tl = createTimeline({
+      autoplay: true
+    })
+    tl.add('#start1',{
+      delay: 1300,
+      opacity: 1,
+      easing: 'easeOutQuad',
+      duration: 800
+    })
+
+    tl.add('#start2',{
+      opacity: 1,
+      easing: 'easeOutQuad',
+      duration: 800
+    }, '+=1200')
+
+    tl.add('#start1',{
+      opacity: 0,
+      easing: 'easeOutQuad',
+      duration: 800,
+
+    }, '+=1300')
+
+    tl.add('#start2',{
+      opacity: 0,
+      easing: 'easeOutQuad',
+      duration: 800,
+
+    }, '-=800')
+
+    const mainpage = createTimeline({
+      autoplay:true
+    })
+
+    mainpage.add('#page',{
+      backgroundColor: ['#ffffff', '#fffde7'],
+      duration: 1800,
+      easing: 'easeInOutQuad',
+      autoplay: false,
+      delay: 6200
+    }, '+=1300');
+
+    setTimeout(() => {
+      router.push('/mainpage');
+    }, 8800);
+  }, []);
+
+  return (
+    
+    <main id='page' className="min-h-screen bg-white text-red-700 flex items-center justify-center px-6">
+      
+      <p id='start2' className='absolute text-center max-w-md w-full text-black text-xl translate-y-[60px] opacity-0'>by group f26</p>
+      <p id='start1' className='absolute text-center max-w-md w-full text-black text-7xl opacity-0'>placeholder</p>
+
     </main>
   );
 }
