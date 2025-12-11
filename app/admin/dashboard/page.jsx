@@ -1,11 +1,9 @@
 'use client';
 
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/navigation';
 import { animate, createTimeline, cubicBezier} from 'animejs';
-
-import {useEffect} from 'react';
 
 
 export default function AdminDashboard() {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { createTimeline } from 'animejs';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -12,11 +13,107 @@ export default function SignInPage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
+    const intro = createTimeline({
+      autoplay: true
+    })
+
+
+    intro.add('#back', {
+      translateX: [-690, 40],
+      translateY: [-215, -215],
+      opacity: 1,
+      duration: 400,
+      easing: 'easeInOutQuad'
+    })
+    intro.add('#content', {
+      translateX: [-650, 0],
+      opacity: 1,
+      duration: 400,
+      easing: 'easeInOutQuad'
+    }, '-=400')
+
     setRole(initialRole);
   }, [initialRole]);
 
+  async function handleBack() {
+      if (disabled) return;
+      setDisabled(true);
+  
+      // Optional: call your sign-out endpoint to clear server session
+      try {
+        await fetch('/signin', { method: 'POST' });
+      } catch (err) {
+        // continue anyway
+      }
+  
+      // Animate button up and fade out
+  
+      const tl = createTimeline({
+        autoplay: true
+      });
+
+      
+      tl.add('#back',{
+        opacity: 0,
+        duration: 400,
+        easing: 'easeInOutQuad'
+      });
+
+      tl.add('#content',{
+        opacity: 0,
+        duration: 400,
+        easing: 'easeInOutQuad'
+      }, '-=400');
+
+  
+  
+      // Wait for timeline to finish, then navigate
+      setTimeout(() => {
+        router.push('/mainpage');
+      }, 500); // total animation duration
+  }
+
+
+  async function handleRegister() {
+    if (disabled) return;
+    setDisabled(true);
+
+    // Optional: call your sign-out endpoint to clear server session
+    try {
+      await fetch('/register', { method: 'POST' });
+    } catch (err) {
+      // continue anyway
+    }
+
+    // Animate button up and fade out
+
+    const tl = createTimeline({
+      autoplay: true
+    });
+
+    
+    tl.add('#content',{
+      opacity: 0,
+      translateX:[0,-650],
+      duration: 400,
+      easing: 'easeInOutQuad'
+    });
+    tl.add('#back', {
+      translateX: [40, -610],
+      translateY: [-215, -215],
+      opacity: 0,
+      duration: 400,
+      easing: 'easeInOutQuad'
+    }, '-=400')
+
+    // Wait for timeline to finish, then navigate
+    setTimeout(() => {
+      router.push('/register');
+    }, 400); // total animation duration
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -62,11 +159,25 @@ export default function SignInPage() {
     } finally {
       setSubmitting(false);
     }
+
+
   };
 
   return (
     <main className="min-h-screen bg-yellow-50 text-red-800 flex items-center justify-center px-6">
-      <div className="w-full max-w-md space-y-6">
+      <button 
+      id='back' 
+      onClick={handleBack}
+      disabled={disabled}
+      aria-busy={disabled}
+      className="opacity-0 translate-y-[-220px] translate-x-[40px] z-50 relative">
+        <img 
+          src="/index/139-1391483_png-file-svg-back-button-icon-png-transparent-removebg-preview.png" 
+          alt="Home" 
+          className="w-10 h-10 "
+        />
+      </button>
+      <div id='content' className="w-full max-w-md space-y-6 opacity-0">
         <div className="space-y-2 text-center">
           <div className="text-xs uppercase tracking-[0.2em] text-red-500 font-semibold">Sign in</div>
           <h1 className="text-3xl font-bold tracking-tight text-red-700">Log in to your account</h1>
@@ -135,13 +246,14 @@ export default function SignInPage() {
           {error && <div className="text-sm text-red-600">{error}</div>}
 
           <div className="text-center text-sm flex items-center justify-center gap-3 text-red-700">
-            <Link href="/" className="underline hover:text-red-900">
-              Back to home
-            </Link>
-            <span className="text-red-400">•</span>
-            <Link href="/register" className="underline hover:text-red-900 font-semibold">
+            <button 
+            id='registerbutton' 
+            onClick={handleRegister}
+            disabled={disabled}
+            aria-busy={disabled}
+            className="underline hover:text-red-900 font-semibold">
               Create account
-            </Link>
+            </button>
           </div>
         </form>
       </div>

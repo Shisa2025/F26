@@ -1,12 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import {animate, createTimeline} from 'animejs';
+import {useRouter} from 'next/navigation';
 
 export default function RegisterPage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const router = useRouter();
+  const [disabled, setDisabled] = useState(false);
+  useEffect(() => {
+
+    const intro = createTimeline({
+      autoplay:true
+    })
+
+    intro.add('#content', {
+      opacity: 1,
+      translateX: [650, 0],
+      duration: 400,
+      delay:200,
+      easing: 'easeInOutQuad'
+    })
+    
+    intro.add('#back',{
+      opacity: 1,
+      translateY:[-205, -205],
+      translateX: [690, 40],
+      duration: 400,
+      easing: 'easeInOutQuad'
+    }, '-=400')
+
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,11 +73,103 @@ export default function RegisterPage() {
     } finally {
       setSubmitting(false);
     }
+
   };
+  async function handleBack() {
+      if (disabled) return;
+      setDisabled(true);
+  
+      // Optional: call your sign-out endpoint to clear server session
+      try {
+        await fetch('/signin', { method: 'POST' });
+      } catch (err) {
+        // continue anyway
+      }
+  
+      // Animate button up and fade out
+  
+      const tl = createTimeline({
+        autoplay: true
+      });
+
+      
+      tl.add('#back',{
+        opacity: 0,
+        duration: 400,
+        easing: 'easeInOutQuad'
+      });
+
+      tl.add('#content',{
+        opacity: 0,
+        duration: 400,
+        easing: 'easeInOutQuad'
+      }, '-=400');
+
+  
+  
+      // Wait for timeline to finish, then navigate
+      setTimeout(() => {
+        router.push('/mainpage');
+      }, 500); // total animation duration
+  }
+
+
+  async function handleSignIn() {
+    if (disabled) return;
+    setDisabled(true);
+
+    // Optional: call your sign-out endpoint to clear server session
+    try {
+      await fetch('/signin', { method: 'POST' });
+    } catch (err) {
+      // continue anyway
+    }
+
+    // Animate button up and fade out
+
+    const signinanim = createTimeline({
+      autoplay: true
+    });
+
+      
+    signinanim.add('#content', {
+      opacity: 0,
+      translateX: [0, 650],
+      duration: 400,
+      easing: 'easeInOutQuad'
+    })
+    
+    signinanim.add('#back',{
+      opacity: 0,
+      translateY:[-205, -205],
+      translateX: [40, 690],
+      duration: 400,
+      easing: 'easeInOutQuad'
+    }, '-=400')
+
+
+
+    // Wait for timeline to finish, then navigate
+    setTimeout(() => {
+      router.push('/signin');
+    }, 400); // total animation duration
+  }
 
   return (
     <main className="min-h-screen bg-yellow-50 text-red-800 flex items-center justify-center px-6">
-      <div className="w-full max-w-md space-y-6">
+      <button 
+      id='back' 
+      onClick={handleBack}
+      disabled={disabled}
+      aria-busy={disabled}
+      className="opacity-0 translate-y-[-220px] translate-x-[40px] z-50 relative">
+        <img 
+          src="/index/139-1391483_png-file-svg-back-button-icon-png-transparent-removebg-preview.png" 
+          alt="Home" 
+          className="w-10 h-10 "
+        />
+      </button>
+      <div id='content' className="w-full max-w-md space-y-6 opacity-0">
         <div className="space-y-2 text-center">
           <div className="text-xs uppercase tracking-[0.2em] text-red-500 font-semibold">Register</div>
           <h1 className="text-3xl font-bold tracking-tight text-red-700">Create User Account</h1>
@@ -67,7 +186,7 @@ export default function RegisterPage() {
               name="email"
               type="email"
               required
-              className="w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-red-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition"
+              className="w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-red-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none "
               placeholder="you@example.com"
             />
           </div>
@@ -79,7 +198,7 @@ export default function RegisterPage() {
               type="text"
               required
               minLength={3}
-              className="w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-red-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition"
+              className="w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-red-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none "
               placeholder="choose a username"
             />
           </div>
@@ -91,7 +210,7 @@ export default function RegisterPage() {
               type="password"
               required
               minLength={6}
-              className="w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-red-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition"
+              className="w-full rounded-lg border border-red-200 bg-white px-3 py-2 text-red-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none "
               placeholder="••••••"
             />
           </div>
@@ -99,7 +218,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-500 disabled:opacity-70 transition"
+            className="w-full py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-500 disabled:opacity-70 "
           >
             {submitting ? 'Registering...' : 'Register'}
           </button>
@@ -108,13 +227,14 @@ export default function RegisterPage() {
           {error && <div className="text-sm text-red-600">{error}</div>}
 
           <div className="text-center text-sm flex items-center justify-center gap-3 text-red-700">
-            <Link href="/mainpage" className="underline hover:text-red-900">
-              Back to home
-            </Link>
-            <span className="text-red-400">•</span>
-            <Link href="/signin" className="underline hover:text-red-900 font-semibold">
+            <button 
+            id='signinbutton' 
+            onClick={handleSignIn}
+            disabled={disabled}
+            aria-busy={disabled}
+            className="underline hover:text-red-900 font-semibold">
               Login
-            </Link>
+            </button>
           </div>
         </form>
       </div>
