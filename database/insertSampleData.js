@@ -26,6 +26,7 @@ async function main() {
   const users = [
     { email: 'shisa1@example.com', user_name: 'shisa1', password: '123456', account_status: 'active', role: 'user' },
     { email: 'shisa2@example.com', user_name: 'shisa2', password: '123456', account_status: 'pending', role: 'user' },
+    { email: '123@gmail.com', user_name: 'Jasmine', password: '123456', account_status: 'pending', role: 'user' }
   ];
 
   const disasterTypes = [
