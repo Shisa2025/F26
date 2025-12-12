@@ -1,3 +1,8 @@
+Installment
+npm install animejs
+npm install @emoji-mart/react @emoji-mart/data --force
+npm run dev
+
 Description of Functionality
 
 This platform is a web-based application, for disaster reporting and management aimed at enabling users to report, monitor and confirm disaster-related events while offering administrators features to oversee users, disaster information and system security. Additionally it contains a concealed gamified component to boost user involvement.
