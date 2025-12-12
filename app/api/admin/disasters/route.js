@@ -80,21 +80,20 @@ export async function PATCH(req) {
 
     const disasterRow = updateRes.rows[0];
 
-    if (status === 'fake' && disasterRow.reported_by) {
-      // Count fake disasters created by this user (including this update)
-      const { rows: fakeCounts } = await client.query(
-        `SELECT COUNT(*)::int AS fake_count
-         FROM disaster
-         WHERE reported_by = $1 AND status = 'fake'`,
-        [disasterRow.reported_by],
+    if (status === 'fake') {
+      // Re-evaluate all active users: if they have 3+ fake disasters, set to pending.
+      await client.query(
+        `UPDATE "user" u
+         SET account_status = 'pending'
+         WHERE u.account_status = 'active'
+           AND u.id IN (
+             SELECT reported_by
+             FROM disaster
+             WHERE status = 'fake' AND reported_by IS NOT NULL
+             GROUP BY reported_by
+             HAVING COUNT(*) >= 3
+           )`,
       );
-      const fakeCount = fakeCounts[0]?.fake_count ?? 0;
-      if (fakeCount >= 3) {
-        await client.query(
-          `UPDATE "user" SET account_status = 'pending' WHERE id = $1`,
-          [disasterRow.reported_by],
-        );
-      }
     }
 
     await client.query('COMMIT');

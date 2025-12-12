@@ -27,12 +27,22 @@ const formatDate = (value) => {
   }
 };
 
+const formatDateLocal = (value) => {
+  if (!value) return '';
+  try {
+    return new Date(value).toLocaleString();
+  } catch {
+    return value;
+  }
+};
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [updatingId, setUpdatingId] = useState(null);
+  const [fakeDetails, setFakeDetails] = useState({ userId: null, items: [], error: '', loading: false });
 
   const loadUsers = async () => {
     setLoading(true);
@@ -79,6 +89,22 @@ export default function AdminUsersPage() {
       setError(err?.message || 'Network or server error');
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const loadFakeDisasters = async (userId) => {
+    setFakeDetails({ userId, items: [], error: '', loading: true });
+    try {
+      const res = await fetch(`/api/admin/users/fake-disasters?userId=${userId}`);
+      const text = await res.text();
+      const body = text ? JSON.parse(text) : {};
+      if (!res.ok) {
+        setFakeDetails({ userId, items: [], error: body?.error || 'Failed to load fake disasters', loading: false });
+      } else {
+        setFakeDetails({ userId, items: body.disasters || [], error: '', loading: false });
+      }
+    } catch (err) {
+      setFakeDetails({ userId, items: [], error: err?.message || 'Failed to load fake disasters', loading: false });
     }
   };
 
@@ -141,6 +167,15 @@ export default function AdminUsersPage() {
                         {updatingId === u.id ? 'Updating...' : 'Activate'}
                       </button>
                     )}
+                    {u.account_status === 'pending' && (
+                      <button
+                        type="button"
+                        onClick={() => loadFakeDisasters(u.id)}
+                        className="px-3 py-2 rounded-lg border border-amber-300/50 text-amber-100 hover:border-amber-200"
+                      >
+                        View fake reports
+                      </button>
+                    )}
                     {u.account_status === 'banned' && (
                       <button
                         type="button"
@@ -157,7 +192,53 @@ export default function AdminUsersPage() {
             </div>
           )}
         </div>
+        {fakeDetails.userId && (
+          <div className="rounded-2xl border border-white/10 bg-red-800/60 p-4 shadow-xl space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-semibold">
+                Fake disasters reported by user #{fakeDetails.userId}
+              </div>
+              <button
+                type="button"
+                onClick={() => setFakeDetails({ userId: null, items: [], error: '', loading: false })}
+                className="text-xs text-red-200 hover:text-white"
+              >
+                Close
+              </button>
+            </div>
+            {fakeDetails.loading ? (
+              <div className="text-sm text-red-200">Loading...</div>
+            ) : fakeDetails.error ? (
+              <div className="text-sm text-red-200">{fakeDetails.error}</div>
+            ) : fakeDetails.items.length === 0 ? (
+              <div className="text-sm text-red-200">No fake disasters found.</div>
+            ) : (
+              <div className="space-y-2 text-sm">
+                {fakeDetails.items.map((d) => (
+                  <div key={d.id} className="rounded-lg border border-white/15 bg-red-900/50 px-3 py-2 flex justify-between gap-3">
+                    <div>
+                      <div className="font-semibold text-white flex items-center gap-2">
+                        <span className="text-xs uppercase tracking-[0.16em] text-red-200">{d.disaster_type_name || 'Disaster'}</span>
+                        {d.title}
+                      </div>
+                      <div className="text-red-200 text-xs">
+                        Severity: {d.severity} • {d.lat && d.lng ? `${d.lat.toFixed(3)}, ${d.lng.toFixed(3)}` : 'No coords'}
+                      </div>
+                      <div className="text-red-200 text-xs">
+                        {formatDateLocal(d.occurred_at || d.created_at)}
+                      </div>
+                      {d.description && <div className="text-red-100 text-xs mt-1">{d.description}</div>}
+                    </div>
+                    <div className="text-red-200 text-xs">Status: {d.status}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </main>
   );
 }
+
+

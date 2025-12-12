@@ -321,12 +321,6 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/kaiju/dashboard"
-              className="px-4 py-2 rounded-xl bg-red-500/80 border border-red-200/70 text-white font-semibold shadow-lg hover:bg-red-500"
-            >
-              Open Dashboard
-            </Link>
-            <Link
               href="/kaiju/synopsis"
               className="px-4 py-2 rounded-xl border border-white/40 text-white/90 hover:border-white/70 hover:text-white"
             >
@@ -341,7 +335,7 @@ export default function Home() {
         >
           {[
             { title: 'Monitor Incidents', desc: 'Track vectors, threat bands, field units.' },
-            { title: 'Deploy Countermeasures', desc: 'Launch perimeter, barriers, air intercept, evac routing.' },
+            { title: 'Coordinate Response Teams', desc: 'Launch perimeter, barriers, air intercept, evac routing.' },
             { title: 'Guide Civilians', desc: 'Push shelter routes and alerts from one console.' },
           ].map((item) => (
             <div key={item.title} className="rounded-xl border border-white/20 bg-white/5 p-3 holo-grid card-pop">
@@ -418,7 +412,7 @@ export default function Home() {
             </div>
             <h1 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-white">Kaiju Response Hub</h1>
             <p className="text-slate-100/80 max-w-2xl mt-1">
-              Real-time command surface. Pick a console for live ops, countermeasures, or mission brief. Encrypted channels only.
+              Real-time command surface. Pick a console for live ops or mission brief. Encrypted channels only.
             </p>
           </div>
           <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-red-200/40 shadow-2xl">
@@ -439,33 +433,7 @@ export default function Home() {
                 <span className="text-xs text-red-50">Secure link active</span>
               </div>
             </div>
-            <div ref={lanesRef} className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-5">
-              <Link
-                href="/kaiju/dashboard"
-                className="group relative block p-5 rounded-2xl border border-red-200/70 bg-gradient-to-br from-red-500/20 via-red-500/10 to-white/5 hover:border-red-200 transition shadow-xl lane-card shine-sweep"
-              >
-                <div className="text-xs uppercase tracking-[0.14em] text-red-50 mb-1">Live Dashboard</div>
-                <div className="text-xl font-semibold text-white">Kaiju Crisis Console</div>
-                <p className="text-sm text-red-50/90 mt-2">
-                  Incidents, telemetry, strike assets, evacuation corridors, and radio feed.
-                </p>
-                <div className="absolute right-4 top-4 text-[10px] px-2 py-1 rounded-full bg-red-500/30 border border-red-200/80 text-white">
-                  HOT
-                </div>
-              </Link>
-              <Link
-                href="/kaiju/countermeasures"
-                className="group relative block p-5 rounded-2xl border border-amber-200/70 bg-gradient-to-br from-amber-400/20 via-amber-400/10 to-white/5 hover:border-amber-200 transition shadow-xl lane-card shine-sweep"
-              >
-                <div className="text-xs uppercase tracking-[0.14em] text-amber-50 mb-1">Playbook</div>
-                <div className="text-xl font-semibold text-white">Countermeasure Briefing</div>
-                <p className="text-sm text-amber-50/90 mt-2">
-                  Per-kaiju patterns, weapon pairings, interdiction and fallback lines.
-                </p>
-                <div className="absolute right-4 top-4 text-[10px] px-2 py-1 rounded-full bg-amber-400/25 border border-amber-200/80 text-white">
-                  READY
-                </div>
-              </Link>
+            <div ref={lanesRef} className="grid grid-cols-1 gap-4 p-5">
               <Link
                 href="/kaiju/synopsis"
                 className="group relative block p-5 rounded-2xl border border-emerald-200/70 bg-gradient-to-br from-emerald-400/20 via-emerald-400/10 to-white/5 hover:border-emerald-200 transition shadow-xl lane-card shine-sweep"
