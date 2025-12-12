@@ -60,8 +60,8 @@ export default function Home() {
     
     <main id='page' className="min-h-screen bg-white text-red-700 flex items-center justify-center px-6">
       
-      <p id='start2' className='absolute text-center max-w-md w-full text-black text-xl translate-y-[60px] opacity-0'>by group f26</p>
-      <p id='start1' className='absolute text-center max-w-md w-full text-black text-7xl opacity-0'>placeholder</p>
+      <p id='start2' className='absolute text-center max-w-md w-full text-black text-xl translate-y-[100px] opacity-0'>by group f26</p>
+      <p id='start1' className='absolute text-center max-w-md w-full text-black text-9xl opacity-0'>lolo</p>
 
     </main>
   );
