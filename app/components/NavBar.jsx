@@ -28,13 +28,19 @@ function navConfig(pathname) {
     };
   }
 
+  if (pathname.startsWith("/")){
+    return {
+      brand: { label: "HeadsUp", href: "/mainpage" },
+      items: [
+        { label: "Register", href: "/register" },
+        { label: "Login", href: "/signin" },
+        { label: "More info", href: "/info" },
+      ],
+    };
+  }
   return {
     brand: { label: "HeadsUp", href: "/" },
-    items: [
-      { label: "Register", href: "/register" },
-      { label: "Login", href: "/signin" },
-      { label: "More info", href: "/info" },
-    ],
+    items: [],
   };
 }
 
@@ -45,11 +51,12 @@ function isActive(pathname, href) {
 
 export default function NavBar() {
   const pathname = usePathname() || "/";
+  if (pathname === "/") return null;
   const { brand, items } = navConfig(pathname);
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-[#E5D0AC] bg-[#FFF8E1] text-[#6D2323] shadow-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+    <nav className="sticky top-0 z-40 border-b border-[#E5D0AC] bg-[#FFF8E1] text-[#6D2323] shadow-sm animate-border-fade">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 animate-fade-in-opacity-only">
         <Link href={brand.href} className="flex items-center gap-2 text-lg font-semibold text-[#A31D1D] hover:underline">
           <img src="/HeadsUp.png" alt="HeadsUp logo" className="h-10 w-13 object-contain" />
           <span>{brand.label}</span>
@@ -61,7 +68,7 @@ export default function NavBar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded px-3 py-1 transition ${
+                className={`rounded px-3 py-1  ${
                   active
                     ? "bg-[#E5D0AC] text-[#880D1E] font-semibold"
                     : "hover:bg-[#CBEEF3] hover:text-[#A31D1D]"
