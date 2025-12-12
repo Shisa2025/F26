@@ -18,6 +18,8 @@ export async function POST(request) {
       !severity ||
       !Number.isFinite(latNum) ||
       !Number.isFinite(lngNum) ||
+      !Number.isInteger(reportedBy) ||
+      reportedBy <= 0 ||
       !isValidSeverity(severity)
     ) {
       return Response.json(
@@ -36,6 +38,12 @@ export async function POST(request) {
         { status: 404 },
       );
     }
+
+    // Ensure schema supports reported_by
+    await run(
+      `ALTER TABLE disaster
+       ADD COLUMN IF NOT EXISTS reported_by INTEGER REFERENCES "user"(id) ON DELETE SET NULL`,
+    );
 
     // Block deployment if a same-type disaster exists within 1km in the last hour
     const proximitySql = `

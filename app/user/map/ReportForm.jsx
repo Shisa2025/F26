@@ -51,6 +51,10 @@ export default function ReportForm({ position, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!userId) {
+      setStatus({ type: "error", message: "Please sign in again before reporting." });
+      return;
+    }
     setStatus(null);
     const payload = {
       categoryId: Number(categoryId),

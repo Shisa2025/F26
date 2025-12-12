@@ -61,6 +61,12 @@ export async function PATCH(req) {
 
   const client = await pool.connect();
   try {
+    // Ensure reported_by column exists so we can enforce fake-count rule
+    await client.query(
+      `ALTER TABLE disaster
+       ADD COLUMN IF NOT EXISTS reported_by INTEGER REFERENCES "user"(id) ON DELETE SET NULL`,
+    );
+
     await client.query('BEGIN');
 
     const updateRes = await client.query(
@@ -75,7 +81,7 @@ export async function PATCH(req) {
     const disasterRow = updateRes.rows[0];
 
     if (status === 'fake' && disasterRow.reported_by) {
-      // Count fake disasters created by this user
+      // Count fake disasters created by this user (including this update)
       const { rows: fakeCounts } = await client.query(
         `SELECT COUNT(*)::int AS fake_count
          FROM disaster
@@ -85,7 +91,7 @@ export async function PATCH(req) {
       const fakeCount = fakeCounts[0]?.fake_count ?? 0;
       if (fakeCount >= 3) {
         await client.query(
-          `UPDATE "user" SET account_status = 'pending' WHERE id = $1 AND account_status <> 'banned'`,
+          `UPDATE "user" SET account_status = 'pending' WHERE id = $1`,
           [disasterRow.reported_by],
         );
       }

@@ -6,7 +6,7 @@ export async function GET(req) {
   const from = searchParams.get("from");
   const to = searchParams.get("to");
 
-  const clauses = ["d.lat IS NOT NULL", "d.lng IS NOT NULL"];
+  const clauses = ["d.lat IS NOT NULL", "d.lng IS NOT NULL", "d.status <> 'fake'"];
   const params = [];
 
   if (typeId) {

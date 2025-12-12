@@ -44,7 +44,7 @@ async function main() {
       lat: 1.29027,
       lng: 103.851959,
       typeName: 'Earthquake',
-      userEmail: 'shisa1@example.com',
+      reportedBy: 'shisa1@example.com',
     },
     {
       title: 'Aftershock detected',
@@ -55,7 +55,7 @@ async function main() {
       lat: 1.321,
       lng: 103.695,
       typeName: 'Earthquake',
-      userEmail: 'shisa1@example.com',
+      reportedBy: 'shisa1@example.com',
     },
     {
       title: 'River rising',
@@ -66,7 +66,7 @@ async function main() {
       lat: 1.3644,
       lng: 103.9915,
       typeName: 'Flood',
-      userEmail: 'shisa2@example.com',
+      reportedBy: 'shisa2@example.com',
     },
     {
       title: 'Levee seepage',
@@ -77,7 +77,7 @@ async function main() {
       lat: 1.3525,
       lng: 103.708,
       typeName: 'Flood',
-      userEmail: 'shisa2@example.com',
+      reportedBy: 'shisa2@example.com',
     },
   ];
 
@@ -120,7 +120,8 @@ async function main() {
     // disasters: map type name and user email to IDs
     for (const d of disasters) {
       const typeRes = await pool.query('SELECT id FROM disaster_type WHERE name = $1 LIMIT 1', [d.typeName]);
-      const userRes = await pool.query('SELECT id FROM "user" WHERE email = $1 LIMIT 1', [d.userEmail]);
+      const reporterEmail = d.reportedBy || d.userEmail;
+      const userRes = await pool.query('SELECT id FROM "user" WHERE email = $1 LIMIT 1', [reporterEmail]);
       if (typeRes.rowCount === 0 || userRes.rowCount === 0) {
         console.warn(`Skipping disaster "${d.title}" due to missing type/user`);
         continue;
